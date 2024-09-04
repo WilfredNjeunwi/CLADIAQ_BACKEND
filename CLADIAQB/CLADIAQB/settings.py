@@ -74,7 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CLADIAQB.wsgi.application'
 
-
+AUTH_USER_MODEL = 'USERS.CustomUser'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
