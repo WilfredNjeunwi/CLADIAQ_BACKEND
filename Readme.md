@@ -1,0 +1,1 @@
+Here is the standalone version for cladiaq backend in Django
