@@ -33,3 +33,5 @@ class SensorData(models.Model):
     def __str__(self):
         return f"SensorData from Device {self.device_id}"
     
+
+    

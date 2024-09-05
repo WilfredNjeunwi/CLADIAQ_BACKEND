@@ -13,3 +13,9 @@ class ControlLog(models.Model):
 
     def __str__(self):
         return f"ControlLog {self.log_id} for User {self.user_id}"
+    
+class Recommendation(models.Model):
+    recommendation = models.TextField()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now=True)
+    
