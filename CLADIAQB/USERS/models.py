@@ -1,8 +1,25 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+class Profile(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, null=True)
+    phone_number = models.CharField(max_length=255, null=True)
+    email = models.CharField(max_length=255)
+    picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+
+
 class Organization(models.Model):
+    SIZE = (
+        ('home', 'Home'),
+        ('Sm Ent', 'Small Enterprice'),
+        ('Lg Ent', 'Large Enterprice')
+    )
     name = models.CharField(max_length=25)
+    profileId = models.ForeignKey(Profile, null=True, on_delete = models.SET_NULL )
+    size = models.CharField(max_length=30, choices=SIZE, null=True)
+    industry = models.CharField(max_length=255, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -11,10 +28,9 @@ class Organization(models.Model):
 class CustomUser(AbstractUser):
     # Add any additional fields you want here
     address = models.TextField(blank=True, null=True)
-    # organisation = models.TextField(blank=True, null=True)
     tell_num = models.TextField(blank=True, null=True)
     profileID = models.TextField(blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    
 
     def __str__(self):
         return self.username
@@ -31,3 +47,9 @@ class UserOrganizationRole(models.Model):
 
     class Meta:
         unique_together = ('user', 'organization')
+
+class SpecializedServices(models.Model):
+    profile= models.ForeignKey(Profile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.profile.name
