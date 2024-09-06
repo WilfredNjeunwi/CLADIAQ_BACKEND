@@ -12,7 +12,7 @@ class ControlLog(models.Model):
     # route = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"ControlLog {self.log_id} for User {self.user_id}"
+        return f"ControlLog for User {self.user.name}"
     
 
     

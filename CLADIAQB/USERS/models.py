@@ -56,3 +56,10 @@ class SpecializedServices(models.Model):
 
     def __str__(self):
         return self.profile.name
+    
+
+class Recommendation(models.Model):
+    recommendation = models.TextField()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    
+    time = models.DateTimeField(auto_now=True)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, Organization, CustomUser, UserOrganizationRole, SpecializedServices
+from .models import Profile, Organization, CustomUser, UserOrganizationRole, SpecializedServices, Recommendation
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
@@ -25,3 +25,9 @@ class UserOrganizationRoleAdmin(admin.ModelAdmin):
 class SpecializedServicesAdmin(admin.ModelAdmin):
     list_display = ('profile',)  # Customize as needed
     search_fields = ('profile__name',)
+
+
+@admin.register(Recommendation)
+class RecommendationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'time', 'recommendation')  # Customize as needed
+    search_fields = ('user__username', 'recommendation')  # Adjust based on related fields
