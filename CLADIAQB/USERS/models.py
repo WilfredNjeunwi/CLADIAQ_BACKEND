@@ -7,7 +7,9 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=255, null=True)
     email = models.CharField(max_length=255)
     picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
-
+    
+    def __str__(self):
+        return self.name
 
 class Organization(models.Model):
     SIZE = (
@@ -16,9 +18,10 @@ class Organization(models.Model):
         ('Lg Ent', 'Large Enterprice')
     )
     name = models.CharField(max_length=25)
-    profileId = models.ForeignKey(Profile, null=True, on_delete = models.SET_NULL )
+    profile = models.ForeignKey(Profile, null=True, on_delete = models.SET_NULL )
     size = models.CharField(max_length=30, choices=SIZE, null=True)
     industry = models.CharField(max_length=255, null=True)
+    verified = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -29,7 +32,7 @@ class CustomUser(AbstractUser):
     # Add any additional fields you want here
     address = models.TextField(blank=True, null=True)
     tell_num = models.TextField(blank=True, null=True)
-    profileID = models.TextField(blank=True, null=True)
+    profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     
 
     def __str__(self):

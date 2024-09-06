@@ -1,90 +1,70 @@
-# from rest_framework import status, viewsets
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from rest_framework.views import APIView
-# from django.contrib.auth import authenticate
-# from rest_framework.authtoken.models import Token
-# from drf_yasg.utils import swagger_auto_schema
-# from drf_yasg import openapi
-# from .serializers import UserSerializer, OrganizationSerializer, UserOrganizationRoleSerializer
-# from .models import CustomUser, Organization, UserOrganizationRole
+from rest_framework import viewsets, permissions, generics, status
+from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from .models import CustomUser, Profile, Organization, UserOrganizationRole
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer, ProfileSerializer, OrganizationSerializer, UserOrganizationRoleSerializer, OrganizationUserSerializer
 
-# class RegisterView(APIView):
-#     """
-#     Register a new user.
-#     """
-#     @swagger_auto_schema(
-#         request_body=UserSerializer,
-#         responses={
-#             201: openapi.Response('User created', UserSerializer),
-#             400: openapi.Response('Invalid input')
-#         }
-#     )
-#     def post(self, request):
-#         serializer = UserSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user = serializer.save()
-#             token, created = Token.objects.get_or_create(user=user)
-#             return Response({'username': user.username, 'token': token.key}, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can view
 
-# class LoginView(APIView):
-#     """
-#     Login an already existing user.
-#     """
-#     @swagger_auto_schema(
-#         request_body=openapi.Schema(
-#             type=openapi.TYPE_OBJECT,
-#             properties={
-#                 'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username'),
-#                 'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password')
-#             }
-#         ),
-#         responses={
-#             200: openapi.Response('Login Success', openapi.Schema(type=openapi.TYPE_OBJECT, properties={'token': openapi.Schema(type=openapi.TYPE_STRING)})),
-#             401: openapi.Response('Invalid credentials')
-#         }
-#     )
-#     def post(self, request):
-#         username = request.data.get('username')
-#         password = request.data.get('password')
-#         user = authenticate(username=username, password=password)
-#         if user:
-#             token, created = Token.objects.get_or_create(user=user)
-#             return Response({'token': token.key}, status=status.HTTP_200_OK)
-#         return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can view
 
-# class UserDetailView(APIView):
-#     permission_classes = [IsAuthenticated]
+class OrganizationViewSet(viewsets.ModelViewSet):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    permission_classes = [permissions.IsAdminUser]  # Only admins can view
 
-#     @swagger_auto_schema(
-#         responses={200: openapi.Response('User details', UserSerializer)}
-#     )
-#     def get(self, request):
-#         user = request.user
-#         serializer = UserSerializer(user)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+class UserOrganizationRoleViewSet(viewsets.ModelViewSet):
+    queryset = UserOrganizationRole.objects.all()
+    serializer_class = UserOrganizationRoleSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can view
 
-# # Organization ViewSet
-# class OrganizationViewSet(viewsets.ModelViewSet):
-#     queryset = Organization.objects.all()
-#     serializer_class = OrganizationSerializer
-#     permission_classes = [IsAuthenticated]
+class UserLoginView(generics.GenericAPIView):
+    serializer_class = UserLoginSerializer
+    permission_classes = [permissions.AllowAny]
 
-#     @swagger_auto_schema(
-#         responses={200: OrganizationSerializer(many=True), 401: 'Unauthorized'}
-#     )
-#     def list(self, request, *args, **kwargs):
-#         return super().list(request, *args, **kwargs)
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
 
-# # User Organization Role ViewSet
-# class UserOrganizationRoleViewSet(viewsets.ModelViewSet):
-#     queryset = UserOrganizationRole.objects.all()
-#     serializer_class = UserOrganizationRoleSerializer
-#     permission_classes = [IsAuthenticated]
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=200)
+        return Response({'error': 'Invalid Credentials'}, status=400)
 
-#     @swagger_auto_schema(
-#         responses={200: UserOrganizationRoleSerializer(many=True), 401: 'Unauthorized'}
-#     )
-#     def list(self, request, *args, **kwargs):
-#         return super().list(request, *args, **kwargs)
+class CreateOrganizationUserView(generics.CreateAPIView):
+    serializer_class = OrganizationUserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        user_roles = UserOrganizationRole.objects.filter(user=user)
+        if user_roles.exists():
+            organization = user_roles.first().organization  # Get the first organization
+        else:
+            raise NotFound("User does not have an associated organization.")  # Handle the case where the user has no organization role        
+        serializer.save(organization=organization)
+
+class UserRegistrationView(generics.CreateAPIView):
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'message': 'User registered successfully.'
+        }, status=status.HTTP_201_CREATED)
