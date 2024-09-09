@@ -5,3 +5,4 @@ drf_yasg
 setuptools
 channels
 daphne
+gunicorn 
