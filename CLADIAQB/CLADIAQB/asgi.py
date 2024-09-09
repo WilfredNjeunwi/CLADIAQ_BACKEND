@@ -1,13 +1,11 @@
 # asgi.py
-import sys
-print(sys.path)
+
 import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.urls import path
-
-from ..DEVICE.consumers import SensorDataConsumer
+from DEVICE.consumers import SensorDataConsumer
  # Replace with your app name
 
 
