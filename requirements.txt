@@ -4,4 +4,4 @@ pillow
 drf_yasg
 setuptools
 channels
-dapne
+daphne
