@@ -2,3 +2,6 @@ django
 djangorestframework
 pillow
 drf_yasg
+setuptools
+channels
+dapne

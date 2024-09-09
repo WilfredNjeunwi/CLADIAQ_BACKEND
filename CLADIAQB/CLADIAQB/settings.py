@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'DEVICE',
     'CORE',
     'drf_yasg',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,8 @@ REST_FRAMEWORK = {
 }
 
 WSGI_APPLICATION = 'CLADIAQB.wsgi.application'
+# settings.py
+ASGI_APPLICATION = 'CLADIAQB.asgi.application'  # Replace with your project's name
 
 AUTH_USER_MODEL = 'USERS.CustomUser'
 # Database
@@ -103,6 +106,13 @@ DATABASES = {
     # }
 }
 
+# settings.py
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
