@@ -24,6 +24,7 @@ class SensorDataViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        
 
         # Send the sensor data to the WebSocket group
         channel_layer = get_channel_layer()
