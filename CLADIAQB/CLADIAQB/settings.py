@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import dj_database_url
 
 from pathlib import Path
 
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     'USERS',
     'DEVICE',
     'CORE',
-    'drf_yasg',
     'channels',
 ]
 
@@ -92,10 +92,22 @@ AUTH_USER_MODEL = 'USERS.CustomUser'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        # internal 
+        default='postgresql://cladiaq:z9dO7M4DbbBzrZIBf0JPfirWnjZAUyRz@dpg-crimb4jv2p9s738khi5g-a/cladiaq_db_gjqb',
+        # external
+        #default= 'postgresql://cladiaq:z9dO7M4DbbBzrZIBf0JPfirWnjZAUyRz@dpg-crimb4jv2p9s738khi5g-a.oregon-postgres.render.com/cladiaq_db_gjqb',
+        
+        conn_max_age=600
+    )
+    # normal database
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+
+    # local Database
     # 'default': {
     #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME': 'wilfred',
