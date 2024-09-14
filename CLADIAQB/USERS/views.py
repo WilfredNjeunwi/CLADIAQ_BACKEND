@@ -9,22 +9,23 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSe
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can view
+    permission_classes = [permissions.AllowAny]  # Only authenticated users can view
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can view
+    permission_classes = [permissions.AllowAny]  # Only authenticated users can view
 
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = [permissions.IsAdminUser]  # Only admins can view
+    #isadminuser
+    permission_classes = [permissions.AllowAny]  # Only admins can view
 
 class UserOrganizationRoleViewSet(viewsets.ModelViewSet):
     queryset = UserOrganizationRole.objects.all()
     serializer_class = UserOrganizationRoleSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can view
+    permission_classes = [permissions.AllowAny]  # Only authenticated users can view
 
 class UserLoginView(generics.GenericAPIView):
     serializer_class = UserLoginSerializer
@@ -42,7 +43,7 @@ class UserLoginView(generics.GenericAPIView):
 
 class CreateOrganizationUserView(generics.CreateAPIView):
     serializer_class = OrganizationUserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
         user = self.request.user
