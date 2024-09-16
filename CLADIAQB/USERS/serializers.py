@@ -88,7 +88,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             address=validated_data.get('address'),
             phone_number=validated_data.get('tell_num'),
         )
-        user.profile = profile.pk
+        user.profile = profile
         user.save()
 
         # Create the organization
